@@ -25,16 +25,17 @@ export const CacheTTL = {
  * @param obj - Object to hash (query params, filters, etc.)
  * @param version - Optional version override
  */
-export async function keyBuilder(prefix: string, obj: any, version?: string): Promise<string> {
+export function keyBuilder(prefix: string, obj: any, version?: string): string {
   const str = JSON.stringify(obj)
-  // Use Web Crypto API for edge runtime compatibility
-  const encoder = new TextEncoder()
-  const data = encoder.encode(str)
-  const hashBuffer = await crypto.subtle.digest('SHA-1', data)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 12)
-  const v = version || process.env.MEILI_INDEX_VERSION || "1"
-  return `${prefix}:${hash}:v${v}`
+  // Simple hash for edge runtime
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i)
+    hash = hash & hash
+  }
+  const hashStr = Math.abs(hash).toString(36).substring(0, 12)
+  const v = version || "1"
+  return `${prefix}:${hashStr}:v${v}`
 }
 
 /**
@@ -47,9 +48,9 @@ export function productKey(id: string): string {
 /**
  * Generate category cache key
  */
-export async function categoryKey(slug: string, filters?: any): Promise<string> {
+export function categoryKey(slug: string, filters?: any): string {
   if (filters) {
-    return await keyBuilder(CacheKeys.CATEGORY, { slug, ...filters })
+    return keyBuilder(CacheKeys.CATEGORY, { slug, ...filters })
   }
   return `${CacheKeys.CATEGORY}:${slug}`
 }
@@ -57,8 +58,8 @@ export async function categoryKey(slug: string, filters?: any): Promise<string> 
 /**
  * Generate search cache key with query hash
  */
-export async function searchKey(query: string, filters?: any): Promise<string> {
-  return await keyBuilder(CacheKeys.SEARCH, { query, ...filters })
+export function searchKey(query: string, filters?: any): string {
+  return keyBuilder(CacheKeys.SEARCH, { query, ...filters })
 }
 
 /**

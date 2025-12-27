@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   const limit = parseInt(searchParams.get("limit") || "20", 10)
 
   const filters: any = { category, minPrice, maxPrice, page, limit }
-  const cacheKey = await searchKey(query, filters)
+  const cacheKey = searchKey(query, filters)
 
   try {
     const { data: cached } = await getCache<any>(cacheKey)
