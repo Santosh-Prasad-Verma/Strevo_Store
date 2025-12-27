@@ -9,7 +9,7 @@ const meili = new MeiliSearch({
   apiKey: process.env.MEILI_SEARCH_KEY!,
 })
 
-export const runtime = "edge"
+// export const runtime = "edge" // Disabled: use Node.js runtime for MeiliSearch compatibility
 export const dynamic = "force-dynamic"
 
 export async function GET(request: NextRequest) {
