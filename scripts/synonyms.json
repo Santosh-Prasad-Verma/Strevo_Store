@@ -1,0 +1,46 @@
+{
+  "apparel": {
+    "t-shirt": ["t shirt", "tshirt", "tee", "tee shirt", "t-shirts", "tees"],
+    "hoodie": ["hoodies", "sweatshirt", "pullover", "sweater"],
+    "jeans": ["denim", "pants", "trousers"],
+    "jacket": ["coat", "outerwear", "blazer"],
+    "dress": ["frock", "gown", "sundress"],
+    "shorts": ["short pants", "bermuda"],
+    "skirt": ["mini skirt", "maxi skirt"],
+    "sweater": ["jumper", "pullover", "cardigan"]
+  },
+  "footwear": {
+    "sneakers": ["shoes", "trainers", "kicks", "runners"],
+    "boots": ["ankle boots", "combat boots"],
+    "sandals": ["flip flops", "slippers"],
+    "heels": ["high heels", "pumps", "stilettos"]
+  },
+  "accessories": {
+    "bag": ["handbag", "purse", "tote", "backpack"],
+    "hat": ["cap", "beanie", "snapback"],
+    "scarf": ["shawl", "wrap"],
+    "belt": ["waistband", "strap"]
+  },
+  "colors": {
+    "black": ["blk", "noir"],
+    "white": ["wht", "blanc"],
+    "blue": ["navy", "denim"],
+    "red": ["crimson", "burgundy"],
+    "green": ["olive", "forest"],
+    "gray": ["grey", "charcoal"],
+    "beige": ["tan", "khaki", "cream"]
+  },
+  "sizes": {
+    "small": ["s", "sm"],
+    "medium": ["m", "md"],
+    "large": ["l", "lg"],
+    "extra large": ["xl", "x-large"],
+    "extra extra large": ["xxl", "2xl"]
+  },
+  "styles": {
+    "casual": ["everyday", "relaxed"],
+    "formal": ["dressy", "elegant"],
+    "sporty": ["athletic", "active"],
+    "vintage": ["retro", "classic"]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "searchableAttributes": [
+    "name",
+    "brand",
+    "category",
+    "subcategories",
+    "tags",
+    "description",
+    "variants.sku",
+    "variants.color",
+    "variants.size"
+  ],
+  "filterableAttributes": [
+    "brand",
+    "category",
+    "subcategories",
+    "price",
+    "colors",
+    "sizes",
+    "materials",
+    "is_active",
+    "stock_quantity"
+  ],
+  "sortableAttributes": [
+    "price",
+    "created_at",
+    "stock_quantity"
+  ],
+  "synonyms": {
+    "t-shirt": ["t shirt", "tshirt", "tee", "tee shirt"],
+    "hoodie": ["hoodies", "sweatshirt", "pullover"],
+    "jeans": ["denim", "pants"],
+    "sneakers": ["shoes", "trainers", "kicks"],
+    "jacket": ["coat", "outerwear"],
+    "dress": ["frock", "gown"]
+  },
+  "rankingRules": [
+    "typo",
+    "words",
+    "proximity",
+    "attribute",
+    "sort",
+    "exactness"
+  ],
+  "typoTolerance": {
+    "enabled": true,
+    "minWordSizeForTypos": {
+      "oneTypo": 4,
+      "twoTypos": 8
+    }
+  },
+  "pagination": {
+    "maxTotalHits": 10000
+  }
+}

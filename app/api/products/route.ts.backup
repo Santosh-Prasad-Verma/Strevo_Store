@@ -1,0 +1,62 @@
+import { NextRequest, NextResponse } from "next/server"
+import { getProducts } from "@/lib/actions/products"
+import { getCache, setCache } from "@/lib/cache/redis"
+import { CacheKeys, CacheTTL } from "@/lib/cache/keyBuilder"
+
+export const revalidate = 60
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const limit = searchParams.get('limit')
+  const sort = searchParams.get('sort')
+  
+  const cacheKey = `${CacheKeys.PRODUCT}:list:${limit || 'all'}:${sort || 'default'}`
+
+  try {
+    // Try cache with timeout
+    const cachePromise = getCache<any>(cacheKey)
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Cache timeout')), 1000)
+    )
+    
+    try {
+      const cached = await Promise.race([cachePromise, timeoutPromise])
+      if (cached) {
+        const response = NextResponse.json(cached)
+        response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120')
+        response.headers.set('X-Cache', 'HIT')
+        return response
+      }
+    } catch (cacheError) {
+      console.log('Cache miss or timeout, fetching from DB')
+    }
+
+    const products = await getProducts()
+    
+    let result = products
+    if (sort === 'created_at:desc') {
+      result = products.sort((a: any, b: any) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+    }
+    
+    if (limit) {
+      result = result.slice(0, parseInt(limit))
+    }
+    
+    const data = { data: result }
+    
+    // Set cache without waiting
+    setCache(cacheKey, data, CacheTTL.PRODUCT).catch(err => 
+      console.error('Cache set error:', err)
+    )
+
+    const response = NextResponse.json(data)
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120')
+    response.headers.set('X-Cache', 'MISS')
+    return response
+  } catch (error) {
+    console.error("[v0] Error in products API:", error)
+    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
+  }
+}

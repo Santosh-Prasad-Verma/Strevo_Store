@@ -1,0 +1,69 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+.next/
+out/
+build/
+dist/
+
+# Environment
+.env
+.env*.local
+.env.local.backup
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.history/
+
+# OS
+.DS_Store
+Thumbs.db
+*.db
+
+# Testing
+coverage/
+.nyc_output/
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Misc
+*.log
+.cache/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Trash
+trash-removed/
+
+# Temporary files
+audit.json
+audit-report.json
+GIT_COMMIT_MESSAGE.txt
+package.json.scripts
+
+.vercel
+.env*.local
+
+# Large files and executables
+*.exe
+meilisearch.exe
+data.ms/

@@ -1,0 +1,353 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('/fonts/neue-montreal-free-demo-pangram-pangram-030418/NeueMontreal-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('/fonts/neue-montreal-free-demo-pangram-pangram-030418/NeueMontreal-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('/fonts/neue-montreal-free-demo-pangram-pangram-030418/NeueMontreal-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Monument Extended';
+  src: url('/fonts/monumentextended-freeforpersonaluse/MonumentExtended-FreeForPersonalUse/MonumentExtended-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Monument Extended';
+  src: url('/fonts/monumentextended-freeforpersonaluse/MonumentExtended-FreeForPersonalUse/MonumentExtended-Ultrabold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Helvetica Now';
+  src: url('/fonts/helvetica-now-font-family-1763812397-0/helveticanowtext-bold-demo.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Akzidenz Grotesk';
+  src: url('/fonts/akzidenz-grotesk-similar/freesans/FreeSans.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Akzidenz Grotesk';
+  src: url('/fonts/akzidenz-grotesk-similar/freesans/FreeSansBold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Helvetica Now', 'Neue Montreal', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  
+  .font-hero {
+    font-family: 'Monument Extended', 'Neue Montreal', sans-serif;
+  }
+  
+  .font-heading {
+    font-family: 'Neue Montreal', sans-serif;
+  }
+  
+  .font-body {
+    font-family: 'Helvetica Now', 'Neue Montreal', sans-serif;
+  }
+  
+  .font-editorial {
+    font-family: 'Akzidenz Grotesk', 'FreeSans', sans-serif;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+.animated-border-btn {
+  position: relative;
+  padding: 20px 70px;
+  border: 1px solid white;
+  color: white;
+  text-decoration: none;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  transition: border 0.3s;
+}
+
+.animated-border-btn:hover {
+  border: none;
+}
+
+.animated-border-btn .line-1,
+.animated-border-btn .line-2,
+.animated-border-btn .line-3,
+.animated-border-btn .line-4 {
+  content: '';
+  display: block;
+  position: absolute;
+  background-color: white;
+}
+
+.animated-border-btn .line-1 {
+  width: 1px;
+  left: 0;
+  bottom: 0;
+}
+
+.animated-border-btn .line-2 {
+  height: 1px;
+  left: 0;
+  top: 0;
+}
+
+.animated-border-btn .line-3 {
+  width: 1px;
+  right: 0;
+  top: 0;
+}
+
+.animated-border-btn .line-4 {
+  height: 1px;
+  right: 0;
+  bottom: 0;
+}
+
+.animated-border-btn:hover .line-1 {
+  animation: move1 1500ms infinite ease;
+}
+
+.animated-border-btn:hover .line-2 {
+  animation: move2 1500ms infinite ease;
+}
+
+.animated-border-btn:hover .line-3 {
+  animation: move3 1500ms infinite ease;
+}
+
+.animated-border-btn:hover .line-4 {
+  animation: move4 1500ms infinite ease;
+}
+
+@keyframes move1 {
+  0% { height: 100%; bottom: 0; }
+  54% { height: 0; bottom: 100%; }
+  55% { height: 0; bottom: 0; }
+  100% { height: 100%; bottom: 0; }
+}
+
+@keyframes move2 {
+  0% { width: 0; left: 0; }
+  50% { width: 100%; left: 0; }
+  100% { width: 0; left: 100%; }
+}
+
+@keyframes move3 {
+  0% { height: 100%; top: 0; }
+  54% { height: 0; top: 100%; }
+  55% { height: 0; top: 0; }
+  100% { height: 100%; top: 0; }
+}
+
+@keyframes move4 {
+  0% { width: 0; right: 0; }
+  55% { width: 100%; right: 0; }
+  100% { width: 0; right: 100%; }
+}
+
+.slide-btn {
+  color: black;
+  border: 1px solid black;
+  padding: 20px 80px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: transparent;
+  transition: color 300ms;
+}
+
+.slide-btn span {
+  position: relative;
+  z-index: 100;
+}
+
+.slide-btn::before,
+.slide-btn::after {
+  content: '';
+  position: absolute;
+  display: block;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+.slide-btn::before {
+  transform: translate3d(-100%, 0, 0);
+  background-color: black;
+  border: 1px solid black;
+  transition: transform 300ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+
+.slide-btn::after {
+  background-color: #404040;
+  border: 1px solid #404040;
+  transform: translate3d(100%, 0, 0);
+  transition: transform 300ms 300ms cubic-bezier(0.16, 0.73, 0.58, 0.62);
+}
+
+.slide-btn:hover {
+  color: white;
+}
+
+.slide-btn:hover::before {
+  transform: translate3d(0, 0, 0);
+}
+
+.slide-btn:hover::after {
+  transform: translate3d(0, 0, 0);
+}
+
+.tracking-super {
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Custom Scrollbar Styling */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #d4d4d4;
+  border-radius: 3px;
+}
+
+.scrollbar-thin:hover::-webkit-scrollbar-thumb {
+  background-color: #a3a3a3;
+}
+
+/* Firefox scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d4 transparent;
+}
+
+/* Premium Menu Animations */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

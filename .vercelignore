@@ -1,0 +1,14 @@
+.next
+node_modules
+.env.local
+*.log
+.DS_Store
+meilisearch.exe
+scripts/meilisearch.exe
+dumps
+data.ms
+trash-removed
+meilisearch
+docker-compose*.yml
+PROJECT_SCAN_REPORT.md
+k6
