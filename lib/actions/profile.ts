@@ -66,11 +66,19 @@ export async function updateProfile(data: Partial<Profile>) {
 
   // Clear cache
   try {
-    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/cache/clear?key=profile:${user.id}`, {
-      method: 'POST'
-    })
+    // Only allow internal calls to /api/cache/clear
+    const allowedHost = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const safeUserId = encodeURIComponent(user.id);
+    const url = new URL(`/api/cache/clear?key=profile:${safeUserId}`, allowedHost);
+    if (!/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(url.origin) && !/^https:\/\/[a-zA-Z0-9-]+\.[a-zA-Z0-9.-]+$/.test(url.origin)) {
+      throw new Error('Invalid site URL');
+    }
+    await fetch(url.toString(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (e) {
-    console.error('Failed to clear cache:', e)
+    console.error('Failed to clear cache:', e instanceof Error ? e.message.replace(/[\r\n\t\0\f\v]/g, ' ') : String(e));
   }
 
   revalidatePath("/profile")
@@ -92,11 +100,19 @@ export async function updateAvatar(avatarUrl: string) {
 
   // Clear cache
   try {
-    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/cache/clear?key=profile:${user.id}`, {
-      method: 'POST'
-    })
+    // Only allow internal calls to /api/cache/clear
+    const allowedHost = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const safeUserId = encodeURIComponent(user.id);
+    const url = new URL(`/api/cache/clear?key=profile:${safeUserId}`, allowedHost);
+    if (!/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(url.origin) && !/^https:\/\/[a-zA-Z0-9-]+\.[a-zA-Z0-9.-]+$/.test(url.origin)) {
+      throw new Error('Invalid site URL');
+    }
+    await fetch(url.toString(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (e) {
-    console.error('Failed to clear cache:', e)
+    console.error('Failed to clear cache:', e instanceof Error ? e.message.replace(/[\r\n\t\0\f\v]/g, ' ') : String(e));
   }
 
   revalidatePath("/profile")

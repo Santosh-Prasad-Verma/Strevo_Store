@@ -44,29 +44,12 @@ export async function GET(request: NextRequest) {
         : []
     
     if (subcategoryFilters.length > 0) {
-      console.log('Filtering by subcategories:', subcategoryFilters)
-      
-      // Try case-insensitive matching on name field as fallback
-      // since subcategories array might not be populated
-      const subcategoryConditions = subcategoryFilters.map(sub => 
-        `name.ilike.%${sub}%`
-      ).join(',')
-      
-      // First try array overlap if subcategories field exists
-      const { data: withSubcategories } = await supabase
-        .from('products')
-        .select('id')
-        .eq('is_active', true)
-        .overlaps('subcategories', subcategoryFilters)
-        .limit(1)
-      
-      if (withSubcategories && withSubcategories.length > 0) {
-        // Use array overlap
-        query = query.overlaps('subcategories', subcategoryFilters)
-      } else {
-        // Fallback to name matching
-        query = query.or(subcategoryConditions)
-      }
+      // Sanitize for logs
+      const safeSubcategories = subcategoryFilters.map(s => String(s).replace(/[\r\n\t\0\f\v]/g, ' '));
+      console.log('Filtering by subcategories:', JSON.stringify(safeSubcategories));
+
+      // Use array overlap directly - more efficient than checking first
+      query = query.overlaps('subcategories', subcategoryFilters)
     }
 
     if (filters.brands && filters.brands.length > 0) {
@@ -86,12 +69,12 @@ export async function GET(request: NextRequest) {
     }
 
     if (filters.minPrice !== undefined) {
-      console.log('[FILTER] Applying minPrice:', filters.minPrice)
+      console.log('[FILTER] Applying minPrice:', Number(filters.minPrice))
       query = query.gte('price', filters.minPrice)
     }
 
     if (filters.maxPrice !== undefined) {
-      console.log('[FILTER] Applying maxPrice:', filters.maxPrice)
+      console.log('[FILTER] Applying maxPrice:', Number(filters.maxPrice))
       query = query.lte('price', filters.maxPrice)
     }
 
@@ -100,22 +83,12 @@ export async function GET(request: NextRequest) {
     }
 
     if (filters.search) {
-      const searchWords = filters.search.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length >= 3)
-      console.log('[FILTER] Search query:', filters.search, 'Words:', searchWords)
+      const safeSearch = filters.search.replace(/[\r\n\t\0\f\v]/g, ' ');
+      const searchWords = safeSearch.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length >= 3);
+      console.log('[FILTER] Search query:', safeSearch.substring(0, 50), 'Words:', JSON.stringify(searchWords));
       if (searchWords.length > 0) {
-        const conditions = searchWords.flatMap(word => [
-          `name.ilike.% ${word} %`,
-          `name.ilike.${word} %`,
-          `name.ilike.% ${word}`,
-          `description.ilike.% ${word} %`,
-          `description.ilike.${word} %`,
-          `description.ilike.% ${word}`,
-          `brand.ilike.% ${word} %`,
-          `brand.ilike.${word} %`,
-          `brand.ilike.% ${word}`
-        ]).join(',')
-        console.log('[FILTER] OR conditions:', conditions)
-        query = query.or(conditions)
+        const conditions = searchWords.map(word => `name.ilike.%${word}%`).join(',');
+        query = query.or(conditions);
       }
     }
 
@@ -140,17 +113,23 @@ export async function GET(request: NextRequest) {
     const { data: products, error, count } = await query
 
     if (error) {
-      console.error('[FILTER] Query error:', error)
+      console.error('[FILTER] Query error:', error.message?.replace(/[\r\n]/g, ' '))
       throw error
     }
     
-    console.log(`[FILTER] Found ${count} products for filters:`, JSON.stringify(filters, null, 2))
+    // Sanitize filters for logging
+    const safeFilters = JSON.stringify(filters, (key, value) => {
+      if (typeof value === 'string') return value.replace(/[\r\n\t\0\f\v]/g, ' ');
+      return value;
+    }, 2).substring(0, 500);
+    console.log(`[FILTER] Found ${count} products for filters:`, safeFilters);
     if (products && products.length > 0) {
-      console.log('[FILTER] Matched products:', products.map(p => ({ 
-        name: p.name, 
+      const safeProducts = products.map(p => ({
+        name: typeof p.name === 'string' ? p.name.replace(/[\r\n\t\0\f\v]/g, ' ').substring(0, 50) : '',
         price: p.price,
-        description: p.description?.substring(0, 100)
-      })))
+        description: typeof p.description === 'string' ? p.description.replace(/[\r\n\t\0\f\v]/g, ' ').substring(0, 50) : ''
+      }));
+      console.log('[FILTER] Matched products:', JSON.stringify(safeProducts));
     }
 
     const facets = await getFacets(supabase, filters)
@@ -168,8 +147,8 @@ export async function GET(request: NextRequest) {
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
       },
     })
-  } catch (error) {
-    console.error('Filter error:', error)
+  } catch (error: any) {
+    console.error('Filter error:', error.message?.replace(/[\r\n]/g, ' '))
     return NextResponse.json({ error: 'Failed to filter products' }, { status: 500 })
   }
 }
@@ -184,7 +163,7 @@ async function getFacets(supabase: any, filters: ProductFilters) {
     baseQuery = baseQuery.ilike('category', `%${filters.category}%`)
   }
 
-  const { data } = await baseQuery.limit(1000)
+  const { data } = await baseQuery.limit(500)
 
   if (!data) {
     return {
@@ -212,33 +191,27 @@ async function getFacets(supabase: any, filters: ProductFilters) {
     if (product.category) {
       facets.categories[product.category] = (facets.categories[product.category] || 0) + 1
     }
-
     if (product.subcategories) {
       product.subcategories.forEach((sub: string) => {
         facets.subcategories[sub] = (facets.subcategories[sub] || 0) + 1
       })
     }
-
     if (product.brand) {
       facets.brands[product.brand] = (facets.brands[product.brand] || 0) + 1
     }
-
     if (product.colors) {
       product.colors.forEach((color: string) => {
         facets.colors[color] = (facets.colors[color] || 0) + 1
       })
     }
-
     if (product.sizes) {
       product.sizes.forEach((size: string) => {
         facets.sizes[size] = (facets.sizes[size] || 0) + 1
       })
     }
-
     if (product.material) {
       facets.materials[product.material] = (facets.materials[product.material] || 0) + 1
     }
-
     if (product.price) {
       facets.priceRange.min = Math.min(facets.priceRange.min, product.price)
       facets.priceRange.max = Math.max(facets.priceRange.max, product.price)

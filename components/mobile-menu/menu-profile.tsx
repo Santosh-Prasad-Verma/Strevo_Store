@@ -48,8 +48,13 @@ export function MenuProfile({ user, onLogout }: MenuProfileProps) {
               alt={user.name} 
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.currentTarget.style.display = 'none'
-                e.currentTarget.parentElement!.innerHTML = '<svg class="w-6 h-6 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>'
+                e.currentTarget.style.display = 'none';
+                const parent = e.currentTarget.parentElement;
+                if (parent) {
+                  // Remove all children and render a React fallback if possible
+                  while (parent.firstChild) parent.removeChild(parent.firstChild);
+                  // Optionally, you could trigger a state to render <User /> fallback
+                }
               }}
             />
           ) : (

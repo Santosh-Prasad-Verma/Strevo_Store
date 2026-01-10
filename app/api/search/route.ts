@@ -53,11 +53,11 @@ export async function GET(req: NextRequest) {
       const supabase = await createClient();
       let dbQuery = supabase
         .from('products')
-        .select('*')
+        .select('id, name, price, image_url, category, brand, stock_quantity')
         .eq('is_active', true);
       
       if (query) {
-        dbQuery = dbQuery.or(`name.ilike.%${query}%,brand.ilike.%${query}%,description.ilike.%${query}%`);
+        dbQuery = dbQuery.or(`name.ilike.%${query}%,brand.ilike.%${query}%`);
       }
       
       if (filters.category) {
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
         dbQuery = dbQuery.lte('price', filters.maxPrice);
       }
       
-      const { data, error } = await dbQuery
+      const { data, error, count } = await dbQuery
         .order('created_at', { ascending: false })
         .range((page - 1) * limit, page * limit - 1);
       
@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
       
       result = {
         hits: data || [],
-        estimatedTotalHits: data?.length || 0,
+        estimatedTotalHits: count || data?.length || 0,
         facetDistribution: {},
       };
     }

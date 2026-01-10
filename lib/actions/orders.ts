@@ -21,7 +21,7 @@ export async function getUserOrders(): Promise<Order[]> {
     .order("created_at", { ascending: false })
 
   if (error) {
-    console.error("[v0] Error fetching user orders:", error)
+    console.error("[v0] Error fetching user orders:", error.message?.replace(/[\r\n]/g, ' '))
     return []
   }
 
@@ -50,7 +50,7 @@ export async function getOrderById(orderId: string): Promise<(Order & { order_it
     .single()
 
   if (error) {
-    console.error("[v0] Error fetching order:", error)
+    console.error("[v0] Error fetching order:", error.message?.replace(/[\r\n]/g, ' '))
     return null
   }
 

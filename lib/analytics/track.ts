@@ -33,7 +33,7 @@ export function trackEvent(
 
   // Log in development
   if (process.env.NODE_ENV === 'development') {
-    console.log(`[Analytics] ${eventName}`, properties)
+    console.log(`[Analytics] ${eventName}`, JSON.stringify(properties))
   }
 
   // Batch flush after 1 second

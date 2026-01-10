@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       .single()
 
     if (orderError) {
-      console.error("[v0] Error creating order:", orderError)
+      console.error("[v0] Error creating order:", orderError.message?.replace(/[\r\n]/g, ' '))
       throw orderError
     }
 
@@ -60,23 +60,35 @@ export async function POST(request: Request) {
     const { error: itemsError } = await supabase.from("order_items").insert(orderItems)
 
     if (itemsError) {
-      console.error("[v0] Error creating order items:", itemsError)
+      console.error("[v0] Error creating order items:", itemsError.message?.replace(/[\r\n]/g, ' '))
       throw itemsError
     }
 
-    // Reduce stock for each product
-    for (const item of cartItems) {
-      const { data: product } = await supabase
-        .from("products")
-        .select("stock_quantity")
-        .eq("id", item.product_id)
-        .single()
+    // Reduce stock for each product (batch update)
+    const productIds = cartItems.map((item: any) => item.product_id)
+    const { data: products, error: productsError } = await supabase
+      .from("products")
+      .select("id, stock_quantity")
+      .in("id", productIds)
 
+    if (productsError) {
+      console.error("[v0] Error fetching products:", productsError.message?.replace(/[\r\n]/g, ' '))
+      throw productsError
+    }
+
+    // Update stock in batch using RPC or individual updates
+    for (const item of cartItems) {
+      const product = products?.find(p => p.id === item.product_id)
       if (product) {
-        await supabase
+        const { error: updateError } = await supabase
           .from("products")
           .update({ stock_quantity: product.stock_quantity - item.quantity })
           .eq("id", item.product_id)
+
+        if (updateError) {
+          console.error("[v0] Error updating stock:", updateError.message?.replace(/[\r\n]/g, ' '))
+          throw updateError
+        }
       }
     }
 
@@ -84,8 +96,8 @@ export async function POST(request: Request) {
     await clearCart()
 
     return NextResponse.json({ orderId: order.id })
-  } catch (error) {
-    console.error("[v0] Error in create order API:", error)
+  } catch (error: any) {
+    console.error("[v0] Error in create order API:", error.message?.replace(/[\r\n]/g, ' '))
     return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
   }
 }

@@ -51,14 +51,32 @@ export async function POST(request: NextRequest) {
       : Object.values(size_stocks).reduce((sum: number, val) => sum + (val as number), 0)
     const imageCount = parseInt(formData.get("imageCount") as string)
     
-    console.log("Product data:", { name, price, category, gender, size_type, stock_quantity })
+    if (!name || !description || !category || !gender) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    }
+    if (isNaN(price) || price <= 0) {
+      return NextResponse.json({ error: "Invalid price" }, { status: 400 })
+    }
+    if (isNaN(stock_quantity) || stock_quantity < 0) {
+      return NextResponse.json({ error: "Invalid stock quantity" }, { status: 400 })
+    }
+    
+    console.log("Product data:", JSON.stringify({ name: name?.replace(/[\r\n]/g, ' '), price, category: category?.replace(/[\r\n]/g, ' '), gender: gender?.replace(/[\r\n]/g, ' '), size_type: size_type?.replace(/[\r\n]/g, ' '), stock_quantity }))
 
     console.log("Processing images...")
     const imageUrls: string[] = []
 
     for (let i = 0; i < imageCount; i++) {
       const image = formData.get(`image_${i}`) as File
-      if (image) {
+      if (image && image.size > 0) {
+        if (image.size > 5 * 1024 * 1024) {
+          return NextResponse.json({ error: `Image ${i} exceeds 5MB limit` }, { status: 400 })
+        }
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+        if (!allowedTypes.includes(image.type)) {
+          return NextResponse.json({ error: `Image ${i} must be JPEG, PNG, or WebP` }, { status: 400 })
+        }
+        
         const fileExt = image.name.split('.').pop()
         const fileName = `products/${Date.now()}-${i}-${Math.random().toString(36).substring(7)}.${fileExt}`
         
@@ -70,7 +88,7 @@ export async function POST(request: NextRequest) {
           })
 
         if (uploadError) {
-          console.error(`Image ${i} upload error:`, uploadError)
+          console.error(`Image ${i} upload error:`, uploadError?.message?.replace(/[\r\n]/g, ' '))
           throw uploadError
         }
 
@@ -79,12 +97,12 @@ export async function POST(request: NextRequest) {
           .getPublicUrl(uploadData.path)
 
         imageUrls.push(publicUrl)
-        console.log(`Image ${i} uploaded: ${publicUrl}`)
+        console.log(`Image ${i} uploaded: ${publicUrl?.replace(/[\r\n]/g, ' ')}`)
       }
     }
 
     const image_url = imageUrls[0] || "/placeholder.svg"
-    console.log("Image URL:", image_url)
+    console.log("Image URL:", image_url?.replace(/[\r\n]/g, ' '))
 
     console.log("Inserting product into database...")
     const productData = {
@@ -102,7 +120,7 @@ export async function POST(request: NextRequest) {
     }
     // TODO: Add size_stocks column to products table as jsonb type
     // size_stocks: size_type !== "none" ? size_stocks : null,
-    console.log("Product data to insert:", productData)
+    console.log("Product data to insert:", JSON.stringify(productData)?.replace(/[\r\n]/g, ' '))
     
     const { data: product, error } = await supabaseAdmin
       .from("products")
@@ -111,7 +129,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error("Product insert error:", error)
+      console.error("Product insert error:", error?.message?.replace(/[\r\n]/g, ' '))
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -130,9 +148,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(product)
   } catch (error: any) {
     console.error("=== Product creation error ===")
-    console.error("Error message:", error.message)
-    console.error("Error stack:", error.stack)
-    console.error("Full error:", error)
+    console.error("Error message:", error.message?.replace(/[\r\n]/g, ' '))
+    console.error("Error stack:", error.stack?.replace(/[\r\n]/g, ' '))
     return NextResponse.json({ error: error.message || "Failed to create product" }, { status: 500 })
   }
 }

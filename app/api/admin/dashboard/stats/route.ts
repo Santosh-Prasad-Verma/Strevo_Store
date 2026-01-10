@@ -4,9 +4,9 @@ import { getCache, setCache } from "@/lib/cache/redis"
 
 export async function GET() {
   const cacheKey = 'admin:dashboard:stats'
-  const cached = await getCache(cacheKey)
+  const { data: cached, hit } = await getCache(cacheKey)
   
-  if (cached) {
+  if (hit && cached) {
     const response = NextResponse.json(cached)
     response.headers.set('X-Cache-Status', 'HIT')
     return response
@@ -17,13 +17,13 @@ export async function GET() {
   const [orders, profiles, activity] = await Promise.all([
     supabase.from("orders").select("total", { count: "exact" }),
     supabase.from("profiles").select("id", { count: "exact" }),
-    supabase.from("user_activity").select("event_type").eq("event_type", "page_view").gte("created_at", new Date(Date.now() - 3600000).toISOString())
+    supabase.from("user_activity").select("event_type", { count: "exact" }).eq("event_type", "page_view").gte("created_at", new Date(Date.now() - 3600000).toISOString())
   ])
 
   const revenue = orders.data?.reduce((sum, o) => sum + (o.total || 0), 0) || 0
   const orderCount = orders.count || 0
   const customers = profiles.count || 0
-  const liveVisitors = Math.floor((activity.data?.length || 0) / 10)
+  const liveVisitors = Math.floor((activity.count || 0) / 10)
   const conversionRate = orderCount > 0 ? ((orderCount / (customers || 1)) * 100).toFixed(1) : 0
 
   const stats = {

@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { type, id } = body
 
-    console.log(`[WEBHOOK] Revalidation: ${type}`, id)
+    console.log(`[WEBHOOK] Revalidation: ${type}`, id ? String(id).substring(0, 50) : 'none')
 
     switch (type) {
       case 'product':
@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, invalidated: type })
-  } catch (error) {
-    console.error('[WEBHOOK] Error:', error)
+  } catch (error: any) {
+    console.error('[WEBHOOK] Error:', error.message?.replace(/[\r\n]/g, ' '))
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

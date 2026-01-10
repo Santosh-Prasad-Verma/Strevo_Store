@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     const data = { data: result }
     
     setCache(cacheKey, data, CacheTTL.PRODUCT).catch(err => 
-      console.error('Cache set error:', err)
+      console.error('Cache set error:', err.message?.replace(/[\r\n]/g, ' '))
     )
 
     const totalDuration = Date.now() - startTime
@@ -61,8 +61,8 @@ export async function GET(request: NextRequest) {
     response.headers.set('Server-Timing', `db;dur=${dbDuration}, total;dur=${totalDuration}`)
     response.headers.set('Surrogate-Key', 'products')
     return response
-  } catch (error) {
-    console.error("[v0] Error in products API:", error)
+  } catch (error: any) {
+    console.error("[v0] Error in products API:", error.message?.replace(/[\r\n]/g, ' '))
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
   }
 }

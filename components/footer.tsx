@@ -43,14 +43,23 @@ export function Footer() {
     if (!email) return
 
     setIsLoading(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    setIsSubscribed(true)
-    setIsLoading(false)
-    setEmail("")
-    
-    // Reset after 3 seconds
-    setTimeout(() => setIsSubscribed(false), 3000)
+    try {
+      const res = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      })
+      if (res.ok) {
+        setIsSubscribed(true)
+        setEmail("")
+        // Reset after 3 seconds
+        setTimeout(() => setIsSubscribed(false), 3000)
+      }
+    } catch (error) {
+      console.error("Subscription failed:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -225,7 +234,7 @@ export function Footer() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
-                  className="w-full bg-neutral-900/50 border border-neutral-800 text-white placeholder:text-neutral-500 px-4 py-3 text-sm focus:border-white focus:bg-neutral-900 outline-none transition-all duration-200 rounded-none"
+                  className="w-full bg-neutral-900/50 text-white placeholder:text-neutral-500 px-4 py-3 text-sm focus:bg-neutral-900 outline-none transition-all duration-200 rounded-none"
                 />
               </div>
               

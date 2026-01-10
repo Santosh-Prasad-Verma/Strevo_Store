@@ -46,8 +46,12 @@ export function PaymentMethods({ total, shippingData, cartItems, onPaymentMethod
       if (!res.ok) throw new Error()
 
       const { orderId } = await res.json()
-      toast.success("Order placed successfully!")
-      router.push(`/checkout/success?orderId=${orderId}`)
+      if (orderId && /^[a-zA-Z0-9-_]+$/.test(orderId)) {
+        toast.success("Order placed successfully!")
+        router.push(`/checkout/success?orderId=${orderId}`)
+      } else {
+        throw new Error('Invalid order ID')
+      }
     } catch {
       toast.error("Failed to place order")
     } finally {
@@ -115,8 +119,9 @@ export function PaymentMethods({ total, shippingData, cartItems, onPaymentMethod
               <input
                 type="text"
                 value={upiId}
-                onChange={(e) => setUpiId(e.target.value)}
+                onChange={(e) => setUpiId(e.target.value.replace(/[<>"']/g, '').slice(0, 50))}
                 placeholder="yourname@upi"
+                maxLength={50}
                 className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded focus:outline-none focus:border-black transition-colors"
               />
             </div>
@@ -175,8 +180,9 @@ export function PaymentMethods({ total, shippingData, cartItems, onPaymentMethod
               <input
                 type="text"
                 value={cardData.name}
-                onChange={(e) => setCardData({ ...cardData, name: e.target.value })}
+                onChange={(e) => setCardData({ ...cardData, name: e.target.value.replace(/[<>"']/g, '').slice(0, 50) })}
                 placeholder="Name on card"
+                maxLength={50}
                 className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded focus:outline-none focus:border-black transition-colors"
               />
             </div>
@@ -204,7 +210,7 @@ export function PaymentMethods({ total, shippingData, cartItems, onPaymentMethod
         className="w-full bg-black text-white py-3.5 rounded font-medium text-sm hover:bg-neutral-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         <Lock className="w-4 h-4" />
-        {isProcessing ? 'PROCESSING...' : `PLACE ORDER - ${formatINR(total)}`}
+        {isProcessing ? 'PROCESSING...' : `PLACE ORDER - ${formatINR(Number(total) || 0)}`}
       </button>
 
       <p className="text-xs text-center text-neutral-500 mt-3">

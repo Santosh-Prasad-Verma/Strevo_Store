@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from 'react';
+import { sanitizeInput } from '@/lib/auth/validators';
 import Image from 'next/image';
 
 interface SuggestionsListProps {
@@ -68,7 +69,7 @@ export function SuggestionsList({ suggestions, selectedIndex, onSelect, onClose 
               <div className="flex-1 min-w-0">
                 <div 
                   className="font-medium text-sm truncate"
-                  dangerouslySetInnerHTML={{ __html: product._formatted?.name || product.name }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeInput(product._formatted?.name || product.name) }}
                 />
                 <div className="text-xs text-neutral-500">
                   {product.brand} · ${product.price}

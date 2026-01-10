@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { rateLimit } from "@/lib/rate-limit"
 
 export async function POST(req: NextRequest) {
+  const rateLimitResponse = rateLimit(req, 10, 60000)
+  if (rateLimitResponse) return rateLimitResponse
+  
   const { name, productIds, totalPrice } = await req.json()
+  
+  if (!name || !productIds || !Array.isArray(productIds) || productIds.length === 0) {
+    return NextResponse.json({ error: "Invalid input" }, { status: 400 })
+  }
+  
+  if (typeof totalPrice !== 'number' || totalPrice <= 0) {
+    return NextResponse.json({ error: "Invalid total price" }, { status: 400 })
+  }
+  
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 

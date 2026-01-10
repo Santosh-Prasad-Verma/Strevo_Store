@@ -20,11 +20,11 @@ export const meiliAdmin = (() => {
 
 // Search-only client (can be exposed to client)
 export const meiliSearch = (() => {
-  if (!meiliSearchInstance && process.env.MEILI_HOST) {
+  if (!meiliSearchInstance && process.env.MEILI_HOST && process.env.MEILI_SEARCH_KEY) {
     try {
       meiliSearchInstance = new MeiliSearch({
         host: process.env.MEILI_HOST,
-        apiKey: process.env.MEILI_SEARCH_KEY || process.env.MEILI_ADMIN_KEY || '',
+        apiKey: process.env.MEILI_SEARCH_KEY,
       });
     } catch (error) {
       console.warn('[MeiliSearch] Search client initialization failed:', error);

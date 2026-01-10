@@ -21,6 +21,10 @@ export async function GET(request: Request) {
   await supabase.auth.getSession()
   const url = new URL(request.url)
   const redirect = url.searchParams.get('redirect') || '/'
-  const redirectUrl = redirect.startsWith('/') ? new URL(redirect, url.origin) : new URL('/', url.origin)
+  
+  const allowedPaths = /^\/[a-zA-Z0-9/_-]*$/
+  const sanitizedRedirect = redirect.startsWith('/') && allowedPaths.test(redirect) ? redirect : '/'
+  const redirectUrl = new URL(sanitizedRedirect, url.origin)
+  
   return NextResponse.redirect(redirectUrl)
 }

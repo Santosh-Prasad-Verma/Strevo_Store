@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { ProfileHeader } from "@/components/profile/profile-header"
 import { QuickTiles } from "@/components/profile/quick-tiles"
 import { EditProfileDialog } from "@/components/profile/edit-profile-dialog"
@@ -9,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import type { Profile, ProfileSummary } from "@/lib/types/database"
 
 export default function ProfilePage() {
+  const router = useRouter()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [summary, setSummary] = useState<ProfileSummary | null>(null)
   const [editOpen, setEditOpen] = useState(false)
@@ -21,8 +23,20 @@ export default function ProfilePage() {
         fetch("/api/profile"),
         fetch("/api/profile/summary"),
       ])
+      
+      if (profileRes.status === 401 || summaryRes.status === 401) {
+        router.push("/auth/login?redirect=/profile")
+        return
+      }
+      
       const profileData = await profileRes.json()
       const summaryData = await summaryRes.json()
+      
+      if (profileData.error) {
+        console.error("Profile error:", profileData.error)
+        return
+      }
+      
       setProfile(profileData)
       setSummary(summaryData)
     } catch (error) {

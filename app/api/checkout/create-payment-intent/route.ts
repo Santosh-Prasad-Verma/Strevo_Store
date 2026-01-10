@@ -2,8 +2,13 @@ import { NextResponse } from "next/server"
 import { stripe } from "@/lib/stripe"
 import { createClient } from "@/lib/supabase/server"
 import { getCart, getCartTotal } from "@/lib/actions/cart"
+import { rateLimit } from "@/lib/rate-limit"
+import type { NextRequest } from "next/server"
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const rateLimitResponse = rateLimit(request, 3, 60000)
+  if (rateLimitResponse) return rateLimitResponse
+  
   try {
     const supabase = await createClient()
     const {
@@ -21,7 +26,12 @@ export async function POST(request: Request) {
     }
 
     const total = await getCartTotal()
-    const amount = Math.round(total * 100) // Convert to cents
+    
+    if (total <= 0 || total > 999999) {
+      return NextResponse.json({ error: "Invalid cart total" }, { status: 400 })
+    }
+    
+    const amount = Math.round(total * 100)
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,

@@ -3,7 +3,7 @@ const { createClient } = require('@supabase/supabase-js');
 const Redis = require('ioredis');
 
 const MEILI_HOST = process.env.MEILI_HOST || 'http://localhost:7700';
-const MEILI_KEY = process.env.MEILI_ADMIN_KEY || 'masterKey';
+const MEILI_KEY = process.env.MEILI_ADMIN_KEY;
 const INDEX_VERSION = process.env.MEILI_INDEX_VERSION || 'v1';
 
 const meili = new MeiliSearch({ host: MEILI_HOST, apiKey: MEILI_KEY });

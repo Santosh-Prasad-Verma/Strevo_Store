@@ -42,19 +42,31 @@ export function ShippingForm({ onComplete, deliveryOption, onDeliveryChange }: S
     e.preventDefault()
     const newErrors: any = {}
 
-    if (!formData.fullName.trim()) newErrors.fullName = "Required"
-    if (!formData.phone || !validatePhone(formData.phone)) newErrors.phone = "Invalid phone number"
-    if (!formData.pincode || !validatePincode(formData.pincode)) newErrors.pincode = "Invalid pincode"
-    if (!formData.addressLine1.trim()) newErrors.addressLine1 = "Required"
-    if (!formData.city.trim()) newErrors.city = "Required"
-    if (!formData.state.trim()) newErrors.state = "Required"
+    const sanitizedData = {
+      fullName: formData.fullName.trim().replace(/[<>"']/g, ''),
+      phone: formData.phone,
+      pincode: formData.pincode,
+      addressLine1: formData.addressLine1.trim().replace(/[<>"']/g, ''),
+      addressLine2: formData.addressLine2.trim().replace(/[<>"']/g, ''),
+      city: formData.city.trim().replace(/[<>"']/g, ''),
+      state: formData.state.trim().replace(/[<>"']/g, ''),
+      postalCode: formData.postalCode,
+      country: formData.country,
+    }
+
+    if (!sanitizedData.fullName) newErrors.fullName = "Required"
+    if (!sanitizedData.phone || !validatePhone(sanitizedData.phone)) newErrors.phone = "Invalid phone number"
+    if (!sanitizedData.pincode || !validatePincode(sanitizedData.pincode)) newErrors.pincode = "Invalid pincode"
+    if (!sanitizedData.addressLine1) newErrors.addressLine1 = "Required"
+    if (!sanitizedData.city) newErrors.city = "Required"
+    if (!sanitizedData.state) newErrors.state = "Required"
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
       return
     }
 
-    onComplete(formData)
+    onComplete(sanitizedData)
     toast.success("Address saved")
   }
 
@@ -88,7 +100,7 @@ export function ShippingForm({ onComplete, deliveryOption, onDeliveryChange }: S
               className={`w-full px-3 py-2.5 text-sm border ${errors.fullName ? 'border-red-500' : 'border-neutral-300'} rounded focus:outline-none focus:border-black transition-colors`}
               placeholder="Enter your full name"
             />
-            {errors.fullName && <p className="text-xs text-red-500 mt-1">{errors.fullName}</p>}
+            {errors.fullName && <p className="text-xs text-red-500 mt-1">{String(errors.fullName)}</p>}
           </div>
 
           <div>
@@ -105,7 +117,7 @@ export function ShippingForm({ onComplete, deliveryOption, onDeliveryChange }: S
               className={`w-full px-3 py-2.5 text-sm border ${errors.phone ? 'border-red-500' : 'border-neutral-300'} rounded focus:outline-none focus:border-black transition-colors`}
               placeholder="10-digit mobile number"
             />
-            {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
+            {errors.phone && <p className="text-xs text-red-500 mt-1">{String(errors.phone)}</p>}
           </div>
         </div>
 

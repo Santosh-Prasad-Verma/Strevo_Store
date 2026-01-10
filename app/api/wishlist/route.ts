@@ -5,29 +5,39 @@ import { getCache, setCache } from "@/lib/cache/redis"
 export async function GET() {
   try {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
     
-    if (!user) {
+    if (authError || !user) {
       return NextResponse.json([])
     }
 
     const cacheKey = `wishlist:${user.id}`
-    const cached = await getCache(cacheKey)
+    const { data: cached, hit } = await getCache(cacheKey)
     
-    if (cached) {
+    if (hit && cached) {
       return NextResponse.json(cached)
     }
 
-    const { data: items } = await supabase
+    const { data: items, error } = await supabase
       .from('wishlist')
-      .select('*, products(*)')
+      .select('product_id, products(*)')
       .eq('user_id', user.id)
     
-    await setCache(cacheKey, items || [], 300)
+    if (error) {
+      console.error("Wishlist query error:", error)
+      return NextResponse.json([])
+    }
+
+    // Extract products from the nested structure
+    const products = (items || [])
+      .map(item => item.products)
+      .filter(Boolean)
     
-    return NextResponse.json(items || [])
+    await setCache(cacheKey, products, 300)
+    
+    return NextResponse.json(products)
   } catch (error) {
     console.error("Error in wishlist API:", error)
-    return NextResponse.json({ error: "Failed to fetch wishlist" }, { status: 500 })
+    return NextResponse.json([])
   }
 }

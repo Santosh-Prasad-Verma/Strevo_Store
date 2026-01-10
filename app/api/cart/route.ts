@@ -12,18 +12,23 @@ export async function GET() {
     }
 
     const cacheKey = `cart:${user.id}`
-    const cached = await getCache(cacheKey)
+    const { data: cached, hit } = await getCache(cacheKey)
     
-    if (cached) {
+    if (hit && cached) {
       const response = NextResponse.json(cached)
       response.headers.set('X-Cache-Status', 'HIT')
       return response
     }
 
-    const { data: items } = await supabase
+    const { data: items, error } = await supabase
       .from('cart_items')
       .select('*, products(id, name, price, image_url)')
       .eq('user_id', user.id)
+    
+    if (error) {
+      console.error('Cart fetch error:', error)
+      return NextResponse.json({ error: 'Failed to fetch cart' }, { status: 500 })
+    }
     
     const total = items?.reduce((sum, item) => sum + (item.products.price * item.quantity), 0) || 0
     const result = { items: items || [], total }

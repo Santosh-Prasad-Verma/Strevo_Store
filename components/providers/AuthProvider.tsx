@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null)
       setLoading(false)
     }).catch((err) => {
-      console.error('[AUTH] Failed to get session:', err)
+      console.error('[AUTH] Failed to get session:', err.message?.replace(/[\r\n]/g, ' '))
       setError(err.message)
       setLoading(false)
     })
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
 
       if (_event === 'SIGNED_IN') {
-        console.log('[AUTH] login_success', { userId: session?.user?.id })
+        console.log('[AUTH] login_success', JSON.stringify({ userId: session?.user?.id }))
       } else if (_event === 'SIGNED_OUT') {
         console.log('[AUTH] logout_success')
       }
@@ -68,12 +68,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) {
-        console.error('[AUTH] login_failure', error)
+        console.error('[AUTH] login_failure', error.message?.replace(/[\r\n]/g, ' '))
         return { ok: false, error }
       }
       return { ok: true, data }
-    } catch (error) {
-      console.error('[AUTH] login_failure', error)
+    } catch (error: any) {
+      console.error('[AUTH] login_failure', error.message?.replace(/[\r\n]/g, ' '))
       return { ok: false, error }
     }
   }
@@ -89,13 +89,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       })
       if (error) {
-        console.error('[AUTH] signup_failure', error)
+        console.error('[AUTH] signup_failure', error.message?.replace(/[\r\n]/g, ' '))
         return { ok: false, error }
       }
-      console.log('[AUTH] signup_success', { userId: data.user?.id })
+      console.log('[AUTH] signup_success', JSON.stringify({ userId: data.user?.id }))
       return { ok: true, data }
-    } catch (error) {
-      console.error('[AUTH] signup_failure', error)
+    } catch (error: any) {
+      console.error('[AUTH] signup_failure', error.message?.replace(/[\r\n]/g, ' '))
       return { ok: false, error }
     }
   }

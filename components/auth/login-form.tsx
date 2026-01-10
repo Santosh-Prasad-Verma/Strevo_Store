@@ -31,8 +31,8 @@ export function LoginForm() {
       return
     }
 
-    if (!password) {
-      setError('Password is required')
+    if (!password || password.length < 6) {
+      setError('Password must be at least 6 characters')
       setLoading(false)
       return
     }
@@ -42,13 +42,13 @@ export function LoginForm() {
       setLoading(false)
 
       if (!result.ok) {
-        setError(result.error?.message || 'Invalid email or password')
+        setError('Invalid email or password')
       } else {
         router.push('/')
       }
     } catch (error) {
       setLoading(false)
-      setError('Unable to connect. Please check your internet connection or try again later.')
+      setError('Unable to connect. Please try again later.')
     }
   }
 
@@ -90,7 +90,7 @@ export function LoginForm() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border border-neutral-300 focus:border-black focus:outline-none transition-colors"
+            className="w-full px-4 py-3 focus:outline-none transition-colors"
             placeholder="your@email.com"
             aria-describedby="email-helper"
             required
@@ -107,7 +107,7 @@ export function LoginForm() {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-neutral-300 focus:border-black focus:outline-none transition-colors pr-12"
+              className="w-full px-4 py-3 focus:outline-none transition-colors pr-12"
               placeholder="••••••••"
               required
             />
@@ -128,6 +128,7 @@ export function LoginForm() {
               type="checkbox"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
+              className="w-4 h-4 mt-0.5 focus:ring-black"
               className="w-4 h-4 border-neutral-300 focus:ring-black"
             />
             <span className="text-sm">Remember me</span>

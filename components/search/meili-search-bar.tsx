@@ -85,7 +85,7 @@ export function MeiliSearchBar() {
                 <img src={hit.image_url} alt="" className="w-12 h-12 object-cover" />
               )}
               <div className="flex-1">
-                <div className="text-sm font-medium" dangerouslySetInnerHTML={{ __html: hit._formatted?.name || hit.name }} />
+                <div className="text-sm font-medium">{hit.name}</div>
                 <div className="text-xs text-gray-500">₹{hit.price}</div>
               </div>
             </button>

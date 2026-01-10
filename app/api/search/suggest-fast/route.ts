@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
         .order('stock_quantity', { ascending: false })
         .limit(limit)
       
-      console.log('[SUGGEST] Search words:', words, 'Results:', data?.length, 'Error:', error)
+      console.log('[SUGGEST] Search words:', JSON.stringify(words), 'Results:', data?.length, 'Error:', error?.message?.replace(/[\r\n]/g, ' '))
       
       if (data && data.length > 0) {
         suggestions = data.map(row => ({
@@ -77,8 +77,8 @@ export async function GET(request: NextRequest) {
         }
       }
     )
-  } catch (error) {
-    console.error('[SUGGEST] Error:', error)
+  } catch (error: any) {
+    console.error('[SUGGEST] Error:', error.message?.replace(/[\r\n]/g, ' '))
     return NextResponse.json(
       { suggestions: [], error: 'Search failed', timeMs: Date.now() - startTime },
       { status: 500 }

@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { sanitizeInput } from '@/lib/auth/validators';
 import * as RechartsPrimitive from 'recharts'
 
 import { cn } from '@/lib/utils'
@@ -78,25 +79,31 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
+  const sanitizedId = id.replace(/[^a-zA-Z0-9-_]/g, '')
+  const cssContent = Object.entries(THEMES)
+    .map(
+      ([theme, prefix]) => {
+        const themeStyles = colorConfig
+          .map(([key, itemConfig]) => {
+            const sanitizedKey = key.replace(/[^a-zA-Z0-9-_]/g, '')
+            const color =
+              itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
+              itemConfig.color
+            return color && /^#[0-9A-Fa-f]{3,8}$|^rgb|^hsl/.test(color)
+              ? `  --color-${sanitizedKey}: ${color};`
+              : null
+          })
+          .filter(Boolean)
+          .join('\n')
+        return `${prefix} [data-chart=${sanitizedId}] {\n${themeStyles}\n}`
+      },
+    )
+    .join('\n')
+
   return (
     <style
       dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
-  })
-  .join('\n')}
-}
-`,
-          )
-          .join('\n'),
+        __html: sanitizeInput(cssContent),
       }}
     />
   )

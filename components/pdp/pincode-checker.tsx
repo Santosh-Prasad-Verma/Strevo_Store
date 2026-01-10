@@ -37,6 +37,7 @@ export function PincodeChecker() {
             setPincode(value)
             setResult(null)
           }}
+          maxLength={6}
           className="flex-1"
         />
         <Button
@@ -61,7 +62,7 @@ export function PincodeChecker() {
                 <p className="font-medium">Delivery Available</p>
                 <p className="text-xs mt-1 flex items-center gap-1">
                   <Truck className="h-3 w-3" />
-                  Estimated delivery in {result.days}-{(result.days || 0) + 2} days
+                  Estimated delivery in {Number(result.days)}-{Number(result.days || 0) + 2} days
                 </p>
               </div>
             </>

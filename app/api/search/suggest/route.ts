@@ -179,13 +179,13 @@ export async function GET(request: NextRequest) {
     
     // Log slow queries
     if (totalTime > 100) {
-      console.log(`[SLOW SUGGEST] q="${rawQuery}" time=${totalTime.toFixed(0)}ms results=${suggestions.length}`)
+      console.log(`[SLOW SUGGEST] q="${rawQuery.substring(0, 50)}" time=${totalTime.toFixed(0)}ms results=${suggestions.length}`)
     }
     
     return createResponse(suggestions, 'MISS', totalTime, timings)
     
-  } catch (error) {
-    console.error('[SUGGEST ERROR]', error)
+  } catch (error: any) {
+    console.error('[SUGGEST ERROR]', error.message?.replace(/[\r\n]/g, ' '))
     const totalTime = performance.now() - startTime
     
     return NextResponse.json(

@@ -23,7 +23,12 @@ async function SearchResults({ searchParams }: PageProps) {
   if (searchParams.sort) params.set('sort', searchParams.sort);
   if (searchParams.page) params.set('page', searchParams.page);
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/meili/search?${params}`, {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  if (!baseUrl.match(/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$|^https:\/\/[a-zA-Z0-9-]+\.[a-zA-Z0-9.-]+$/)) {
+    throw new Error('Invalid app URL')
+  }
+  
+  const res = await fetch(`${baseUrl}/api/meili/search?${params}`, {
     cache: 'no-store'
   });
   

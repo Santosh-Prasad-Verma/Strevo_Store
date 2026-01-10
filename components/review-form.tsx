@@ -25,9 +25,9 @@ export function ReviewForm({ productId, productName, onSuccess }: ReviewFormProp
 
     const formData = new FormData(e.currentTarget)
     formData.append("rating", rating.toString())
-    if (productId) formData.append("product_id", productId)
-    if (productName) formData.append("product_name", productName)
-    if (imageUrl) formData.append("image_url", imageUrl)
+    if (productId) formData.append("product_id", productId.replace(/[^a-zA-Z0-9-_]/g, ''))
+    if (productName) formData.append("product_name", productName.substring(0, 200))
+    if (imageUrl && /^https?:\/\/.+/.test(imageUrl)) formData.append("image_url", imageUrl)
 
     try {
       const res = await fetch("/api/reviews/submit", {
@@ -55,7 +55,7 @@ export function ReviewForm({ productId, productName, onSuccess }: ReviewFormProp
       
       <div>
         <Label>Your Name</Label>
-        <Input name="name" required placeholder="Enter your name" />
+        <Input name="name" required placeholder="Enter your name" maxLength={100} />
       </div>
 
       <div>
@@ -78,7 +78,7 @@ export function ReviewForm({ productId, productName, onSuccess }: ReviewFormProp
 
       <div>
         <Label>Your Review</Label>
-        <Textarea name="comment" required placeholder="Share your experience..." rows={4} />
+        <Textarea name="comment" required placeholder="Share your experience..." rows={4} maxLength={1000} />
       </div>
 
       <div>

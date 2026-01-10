@@ -12,18 +12,24 @@ export default async function ProfileLayout({ children }: { children: React.Reac
       cookies: { 
         getAll: () => cookieStore.getAll(),
         setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options)
-          })
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options)
+            })
+          } catch {
+            // Ignore cookie setting errors in Server Components
+            // Middleware handles session refresh
+          }
         }
       } 
     }
   )
   const {
     data: { user },
+    error
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (error || !user) {
     redirect('/auth/login?redirect=/profile')
   }
 

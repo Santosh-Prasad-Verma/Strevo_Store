@@ -143,7 +143,7 @@ export function RegisterForm() {
             type="text"
             value={formData.fullName}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-neutral-300 focus:border-black focus:outline-none transition-colors"
+            className="w-full px-4 py-3 focus:outline-none transition-colors"
             placeholder="John Doe"
             required
           />
@@ -159,7 +159,7 @@ export function RegisterForm() {
             type="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-neutral-300 focus:border-black focus:outline-none transition-colors"
+            className="w-full px-4 py-3 focus:outline-none transition-colors"
             placeholder="your@email.com"
             required
           />
@@ -176,7 +176,7 @@ export function RegisterForm() {
               type={showPassword ? 'text' : 'password'}
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-neutral-300 focus:border-black focus:outline-none transition-colors pr-12"
+              className="w-full px-4 py-3 focus:outline-none transition-colors pr-12"
               placeholder="••••••••"
               required
             />
@@ -203,7 +203,7 @@ export function RegisterForm() {
               type={showConfirmPassword ? 'text' : 'password'}
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-neutral-300 focus:border-black focus:outline-none transition-colors pr-12"
+              className="w-full px-4 py-3 focus:outline-none transition-colors pr-12"
               placeholder="••••••••"
               required
             />
@@ -228,7 +228,7 @@ export function RegisterForm() {
             type="tel"
             value={formData.phone}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-neutral-300 focus:border-black focus:outline-none transition-colors"
+            className="w-full px-4 py-3 focus:outline-none transition-colors"
             placeholder="+1 (555) 000-0000"
             required
           />
@@ -240,7 +240,7 @@ export function RegisterForm() {
               type="checkbox"
               checked={acceptTOS}
               onChange={(e) => setAcceptTOS(e.target.checked)}
-              className="w-4 h-4 mt-0.5 border-neutral-300 focus:ring-black"
+              className="w-4 h-4 mt-0.5 focus:ring-black"
               required
             />
             <span className="text-sm">

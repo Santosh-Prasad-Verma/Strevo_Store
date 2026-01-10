@@ -24,7 +24,7 @@ export async function getCart(): Promise<(CartItem & { products: Product })[]> {
     .order("created_at", { ascending: false })
 
   if (error) {
-    console.error("[v0] Error fetching cart:", error)
+    console.error("[v0] Error fetching cart:", error.message?.replace(/[\r\n]/g, ' '))
     return []
   }
 
@@ -42,48 +42,65 @@ export async function addToCart(productId: string, quantity = 1) {
     return { error: "You must be logged in to add items to cart" }
   }
 
-  // Check if item already exists in cart
-  const { data: existingItem } = await supabase
+  // Use upsert to handle both insert and update in one query
+  const { data, error } = await supabase
     .from("cart_items")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq("product_id", productId)
-    .single()
-
-  if (existingItem) {
-    // Update quantity if item exists
-    const { data, error } = await supabase
-      .from("cart_items")
-      .update({ quantity: existingItem.quantity + quantity })
-      .eq("id", existingItem.id)
-      .select()
-      .single()
-
-    if (error) {
-      console.error("[v0] Error updating cart item:", error)
-      return { error: "Failed to update cart" }
-    }
-
-    return { data, success: true }
-  } else {
-    // Insert new item
-    const { data, error } = await supabase
-      .from("cart_items")
-      .insert({
+    .upsert(
+      {
         user_id: user.id,
         product_id: productId,
-        quantity,
-      })
-      .select()
-      .single()
+        quantity: supabase.rpc('increment_quantity', { current_qty: quantity }),
+      },
+      {
+        onConflict: 'user_id,product_id',
+        ignoreDuplicates: false,
+      }
+    )
+    .select()
+    .single()
 
-    if (error) {
-      console.error("[v0] Error adding to cart:", error)
-      return { error: "Failed to add to cart" }
+  if (error) {
+    // Fallback to manual check if upsert not supported
+    const { data: existingItem } = await supabase
+      .from("cart_items")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("product_id", productId)
+      .maybeSingle()
+
+    if (existingItem) {
+      const { data: updated, error: updateError } = await supabase
+        .from("cart_items")
+        .update({ quantity: existingItem.quantity + quantity })
+        .eq("id", existingItem.id)
+        .select()
+        .single()
+
+      if (updateError) {
+        console.error("[v0] Error updating cart item:", updateError.message?.replace(/[\r\n]/g, ' '))
+        return { error: "Failed to update cart" }
+      }
+      return { data: updated, success: true }
+    } else {
+      const { data: inserted, error: insertError } = await supabase
+        .from("cart_items")
+        .insert({
+          user_id: user.id,
+          product_id: productId,
+          quantity,
+        })
+        .select()
+        .single()
+
+      if (insertError) {
+        console.error("[v0] Error adding to cart:", insertError.message?.replace(/[\r\n]/g, ' '))
+        return { error: "Failed to add to cart" }
+      }
+      return { data: inserted, success: true }
     }
-
-    return { data, success: true }
   }
+
+  return { data, success: true }
 }
 
 export async function updateCartItemQuantity(cartItemId: string, quantity: number) {
@@ -110,7 +127,7 @@ export async function updateCartItemQuantity(cartItemId: string, quantity: numbe
     .single()
 
   if (error) {
-    console.error("[v0] Error updating cart quantity:", error)
+    console.error("[v0] Error updating cart quantity:", error.message?.replace(/[\r\n]/g, ' '))
     return { error: "Failed to update quantity" }
   }
 
@@ -131,7 +148,7 @@ export async function removeFromCart(cartItemId: string) {
   const { error } = await supabase.from("cart_items").delete().eq("id", cartItemId).eq("user_id", user.id)
 
   if (error) {
-    console.error("[v0] Error removing from cart:", error)
+    console.error("[v0] Error removing from cart:", error.message?.replace(/[\r\n]/g, ' '))
     return { error: "Failed to remove from cart" }
   }
 
@@ -152,7 +169,7 @@ export async function clearCart() {
   const { error } = await supabase.from("cart_items").delete().eq("user_id", user.id)
 
   if (error) {
-    console.error("[v0] Error clearing cart:", error)
+    console.error("[v0] Error clearing cart:", error.message?.replace(/[\r\n]/g, ' '))
     return { error: "Failed to clear cart" }
   }
 
@@ -170,14 +187,26 @@ export async function getCartCount(): Promise<number> {
     return 0
   }
 
-  const { data, error } = await supabase.from("cart_items").select("quantity").eq("user_id", user.id)
+  // Use aggregate function instead of fetching all rows
+  const { data, error } = await supabase
+    .rpc('get_cart_count', { p_user_id: user.id })
 
   if (error) {
-    console.error("[v0] Error fetching cart count:", error)
-    return 0
+    // Fallback to manual count
+    const { data: items, error: fallbackError } = await supabase
+      .from("cart_items")
+      .select("quantity")
+      .eq("user_id", user.id)
+
+    if (fallbackError) {
+      console.error("[v0] Error fetching cart count:", fallbackError.message?.replace(/[\r\n]/g, ' '))
+      return 0
+    }
+
+    return items?.reduce((total, item) => total + item.quantity, 0) || 0
   }
 
-  return data.reduce((total, item) => total + item.quantity, 0)
+  return data || 0
 }
 
 export async function getCartTotal(): Promise<number> {

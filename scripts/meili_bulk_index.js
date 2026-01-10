@@ -2,7 +2,7 @@ const { MeiliSearch } = require('meilisearch');
 const { createClient } = require('@supabase/supabase-js');
 
 const MEILI_HOST = process.env.MEILI_HOST || 'http://localhost:7700';
-const MEILI_KEY = process.env.MEILI_ADMIN_KEY || 'masterKey';
+const MEILI_KEY = process.env.MEILI_ADMIN_KEY;
 const INDEX_VERSION = process.env.MEILI_INDEX_VERSION || 'v1';
 const CHUNK_SIZE = 1000;
 

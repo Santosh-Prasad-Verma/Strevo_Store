@@ -9,11 +9,36 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setTimeout(() => setIsSubmitting(false), 2000)
+    
+    const formData = new FormData(e.target as HTMLFormElement)
+    const data = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      order: formData.get("order"),
+      subject: formData.get("subject"),
+      message: formData.get("message")
+    }
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      if (res.ok) {
+        setIsSubmitted(true)
+        ;(e.target as HTMLFormElement).reset()
+      }
+    } catch (error) {
+      console.error("Contact form submission failed:", error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -136,6 +161,12 @@ export default function ContactPage() {
               <Button type="submit" disabled={isSubmitting} className="w-full bg-black text-white hover:bg-gray-800">
                 {isSubmitting ? "Sending..." : "Send Message"}
               </Button>
+              
+              {isSubmitted && (
+                <p className="text-green-600 font-medium text-center">
+                  ✓ Message sent successfully! We'll get back to you soon.
+                </p>
+              )}
             </form>
 
             <p className="text-sm text-gray-600 mt-4">

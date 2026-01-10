@@ -42,11 +42,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
       
       if (_event === 'SIGNED_IN') {
-        console.log('[AUTH] login_success', { userId: session?.user?.id })
-        fetchProfile()
+        const safeUserId = String(session?.user?.id || '').replace(/[\r\n\t\0\f\v]/g, ' ');
+        console.log('[AUTH] login_success', JSON.stringify({ userId: safeUserId }));
+        fetchProfile();
       } else if (_event === 'SIGNED_OUT') {
-        console.log('[AUTH] logout_success')
-        setProfile(null)
+        console.log('[AUTH] logout_success');
+        setProfile(null);
       }
     })
 
@@ -60,8 +61,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json()
         setProfile(data)
       }
-    } catch (error) {
-      console.error('Failed to fetch profile:', error)
+    } catch (error: any) {
+      console.error('Failed to fetch profile:', error.message?.replace(/[\r\n]/g, ' '))
     }
   }
 
@@ -69,12 +70,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) {
-        console.error('[AUTH] login_failure', error)
+        console.error('[AUTH] login_failure', error.message?.replace(/[\r\n]/g, ' '))
         return { ok: false, error }
       }
       return { ok: true, data }
-    } catch (error) {
-      console.error('[AUTH] login_failure', error)
+    } catch (error: any) {
+      console.error('[AUTH] login_failure', error.message?.replace(/[\r\n]/g, ' '))
       return { ok: false, error }
     }
   }
@@ -90,13 +91,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       })
       if (error) {
-        console.error('[AUTH] signup_failure', error)
-        return { ok: false, error }
+        const safeMsg = error.message?.replace(/[\r\n\t\0\f\v]/g, ' ');
+        console.error('[AUTH] signup_failure', safeMsg);
+        return { ok: false, error };
       }
-      console.log('[AUTH] signup_success', { userId: data.user?.id })
-      return { ok: true, data }
-    } catch (error) {
-      console.error('[AUTH] signup_failure', error)
+      const safeUserId = String(data.user?.id || '').replace(/[\r\n\t\0\f\v]/g, ' ');
+      console.log('[AUTH] signup_success', JSON.stringify({ userId: safeUserId }));
+      return { ok: true, data };
+    } catch (error: any) {
+      console.error('[AUTH] signup_failure', error.message?.replace(/[\r\n]/g, ' '))
       return { ok: false, error }
     }
   }

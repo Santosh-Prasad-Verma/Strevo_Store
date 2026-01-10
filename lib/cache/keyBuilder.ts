@@ -21,7 +21,7 @@ export const CacheTTL = {
 
 export function keyBuilder(prefix: string, obj: any, version?: string): string {
   const str = JSON.stringify(obj)
-  const hash = crypto.createHash("sha1").update(str).digest("hex").substring(0, 12)
+  const hash = crypto.createHash("sha256").update(str).digest("hex").substring(0, 16)
   const v = version || process.env.MEILI_INDEX_VERSION || "1"
   return `${prefix}:${hash}:v${v}`
 }

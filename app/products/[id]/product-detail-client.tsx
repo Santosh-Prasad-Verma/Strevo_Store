@@ -81,7 +81,7 @@ export function ProductDetailClient({ product, allImages, relatedProducts }: Pro
                   <span className="text-sm font-medium">Select Size</span>
                   <SizeChart sizeType={product.size_type} />
                 </div>
-                <SizeSelector sizes={sizes} onSizeSelect={(size) => console.log(size)} />
+                <SizeSelector sizes={sizes} onSizeSelect={(size) => console.log('Size selected:', size)} />
               </div>
             )}
 

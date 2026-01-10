@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useFilters } from '@/hooks/useFilters'
 import { SidebarFilters } from '@/components/filters/SidebarFilters'
 import { MobileFilters, MobileFilterButton } from '@/components/filters/MobileFilters'
@@ -24,6 +24,48 @@ export default function ProductsPage() {
   
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  
+  // Local search state to prevent keyboard closing on mobile
+  const [localSearch, setLocalSearch] = useState(filters.search || '')
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Sync local search with filters when filters change externally
+  useEffect(() => {
+    if (filters.search !== localSearch && filters.search !== undefined) {
+      setLocalSearch(filters.search)
+    }
+  }, [filters.search])
+
+  // Debounced search update
+  const handleSearchChange = (value: string) => {
+    setLocalSearch(value)
+    
+    // Clear existing timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+    
+    // Set new timer for debounced update
+    debounceTimerRef.current = setTimeout(() => {
+      updateFilters({ search: value || undefined })
+    }, 500)
+  }
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
+  }, [])
+
+  const handleClearSearch = () => {
+    setLocalSearch('')
+    updateFilters({ search: undefined })
+    searchInputRef.current?.focus()
+  }
 
   const activeFilterCount = [
     filters.category,
@@ -58,16 +100,35 @@ export default function ProductsPage() {
             <div className="lg:hidden mb-4">
               <div className="relative">
                 <input
+                  ref={searchInputRef}
                   type="text"
+                  inputMode="search"
+                  enterKeyHint="search"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
                   placeholder="Search products..."
-                  value={filters.search || ''}
-                  onChange={(e) => updateFilters({ search: e.target.value })}
-                  className="w-full px-4 py-3 pl-10 pr-10 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  value={localSearch}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      // Immediately apply search on Enter
+                      if (debounceTimerRef.current) {
+                        clearTimeout(debounceTimerRef.current)
+                      }
+                      updateFilters({ search: localSearch || undefined })
+                      searchInputRef.current?.blur()
+                    }
+                  }}
+                  className="w-full px-4 py-3 pl-10 pr-10 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-base"
                 />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                {filters.search && (
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 pointer-events-none" />
+                {localSearch && (
                   <button
-                    onClick={() => updateFilters({ search: undefined })}
+                    type="button"
+                    onClick={handleClearSearch}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-neutral-100 rounded"
                   >
                     <X className="w-4 h-4" />

@@ -40,16 +40,21 @@ const CurvedLoop = ({
   const velRef = useRef(0);
 
   const textLength = spacing;
+  const sanitizedClassName = className?.replace(/[<>"']/g, '') || ''
+  const sanitizedText = text.replace(/[<>"'&]/g, (char) => {
+    const entities: Record<string, string> = { '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '&': '&amp;' };
+    return entities[char] || char;
+  });
   const totalText = textLength
     ? Array(Math.ceil(1800 / textLength) + 2)
-        .fill(text)
+        .fill(sanitizedText)
         .join('')
-    : text;
+    : sanitizedText;
   const ready = spacing > 0;
 
   useEffect(() => {
     if (measureRef.current) setSpacing(measureRef.current.getComputedTextLength());
-  }, [text, className]);
+  }, [text, sanitizedClassName]);
 
   useEffect(() => {
     if (!spacing) return;
@@ -132,7 +137,7 @@ const CurvedLoop = ({
           <path ref={pathRef} id={pathId} d={pathD} fill="none" stroke="transparent" />
         </defs>
         {ready && (
-          <text fontWeight="bold" xmlSpace="preserve" className={className}>
+          <text fontWeight="bold" xmlSpace="preserve" className={sanitizedClassName}>
             <textPath ref={textPathRef} href={`#${pathId}`} startOffset={offset + 'px'} xmlSpace="preserve">
               {totalText}
             </textPath>

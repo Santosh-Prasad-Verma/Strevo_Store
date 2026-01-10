@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     for (const event of payload.events) {
       // Log in development
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[Analytics] ${event.event}`, event.properties)
+        console.log(`[Analytics] ${event.event?.replace(/[\r\n]/g, ' ')}`, JSON.stringify(event.properties)?.replace(/[\r\n]/g, ' '))
       }
 
       // Here you would send to your analytics service:
@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, count: payload.events.length })
-  } catch (error) {
-    console.error('[Analytics] Error processing events:', error)
+  } catch (error: any) {
+    console.error('[Analytics] Error processing events:', error.message?.replace(/[\r\n]/g, ' '))
     return NextResponse.json({ error: 'Failed to process events' }, { status: 500 })
   }
 }
