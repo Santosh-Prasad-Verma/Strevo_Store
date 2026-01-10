@@ -1,17 +1,17 @@
 "use client"
 
 import { usePathname } from "next/navigation"
+import { Suspense } from "react"
 import { Navbar } from "@/components/navigation/navbar"
 import { Footer } from "@/components/footer"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 
-export function ConditionalLayout({ children }: { children: React.ReactNode }) {
+function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isAdminRoute = pathname?.startsWith('/admin')
   const isAuthRoute = pathname?.startsWith('/auth')
   const isHomePage = pathname === '/'
 
-  // No layout for admin and auth routes
   if (isAdminRoute || isAuthRoute) {
     return <>{children}</>
   }
@@ -23,5 +23,13 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
       <Footer />
       <MobileBottomNav />
     </>
+  )
+}
+
+export function ConditionalLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<>{children}</>}>
+      <LayoutContent>{children}</LayoutContent>
+    </Suspense>
   )
 }

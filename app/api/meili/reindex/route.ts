@@ -13,6 +13,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   
+  if (!meiliAdmin) {
+    return NextResponse.json(
+      { error: 'MeiliSearch not configured', message: 'Search service unavailable' },
+      { status: 503 }
+    );
+  }
+  
   try {
     const newIndexName = `${PRODUCTS_INDEX}_${INDEX_VERSION}_temp`;
     const currentIndexName = `${PRODUCTS_INDEX}_${INDEX_VERSION}`;

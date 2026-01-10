@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 
+export function middleware(request: NextRequest) {
   const response = NextResponse.next()
 
   // Example: Protect admin/profile routes using a simple cookie check (Edge-safe)

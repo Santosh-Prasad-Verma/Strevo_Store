@@ -4,10 +4,18 @@ import { getCache, setCache } from "@/lib/cache/redis.prod"
 import { searchKey, CacheTTL } from "@/lib/cache/keyBuilder.prod"
 import { setCacheHeaders, CacheHeaders } from "@/lib/cache/headers.prod"
 
-const meili = new MeiliSearch({
-  host: process.env.MEILI_HOST!,
-  apiKey: process.env.MEILI_SEARCH_KEY!,
-})
+let meili: MeiliSearch | null = null
+
+if (process.env.MEILI_HOST && process.env.MEILI_SEARCH_KEY) {
+  try {
+    meili = new MeiliSearch({
+      host: process.env.MEILI_HOST,
+      apiKey: process.env.MEILI_SEARCH_KEY,
+    })
+  } catch (error) {
+    console.warn('[MeiliSearch] Initialization failed:', error)
+  }
+}
 
 // export const runtime = "edge" // Disabled: use Node.js runtime for MeiliSearch compatibility
 export const dynamic = "force-dynamic"
@@ -25,6 +33,13 @@ export async function GET(request: NextRequest) {
   const cacheKey = searchKey(query, filters)
 
   try {
+    if (!meili) {
+      return NextResponse.json(
+        { error: "Search service unavailable", hits: [], total: 0 },
+        { status: 503 }
+      )
+    }
+
     const { data: cached } = await getCache<any>(cacheKey)
     if (cached) {
       const response = NextResponse.json({ ...cached, cached: true, cacheKey })

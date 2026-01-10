@@ -8,6 +8,8 @@ import { AuthProvider } from "@/components/providers/AuthProvider"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Strevo Store",
   description: "Technical sportswear designed for precision.",

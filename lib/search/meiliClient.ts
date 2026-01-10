@@ -1,16 +1,37 @@
 import { MeiliSearch } from 'meilisearch';
 
+let meiliAdminInstance: MeiliSearch | null = null;
+let meiliSearchInstance: MeiliSearch | null = null;
+
 // Admin client (server-side only)
-export const meiliAdmin = new MeiliSearch({
-  host: process.env.MEILI_HOST || 'http://localhost:7700',
-  apiKey: process.env.MEILI_ADMIN_KEY || 'masterKey',
-});
+export const meiliAdmin = (() => {
+  if (!meiliAdminInstance && process.env.MEILI_HOST && process.env.MEILI_ADMIN_KEY) {
+    try {
+      meiliAdminInstance = new MeiliSearch({
+        host: process.env.MEILI_HOST,
+        apiKey: process.env.MEILI_ADMIN_KEY,
+      });
+    } catch (error) {
+      console.warn('[MeiliSearch] Admin client initialization failed:', error);
+    }
+  }
+  return meiliAdminInstance;
+})();
 
 // Search-only client (can be exposed to client)
-export const meiliSearch = new MeiliSearch({
-  host: process.env.MEILI_HOST || 'http://localhost:7700',
-  apiKey: process.env.MEILI_SEARCH_KEY || process.env.MEILI_ADMIN_KEY || 'masterKey',
-});
+export const meiliSearch = (() => {
+  if (!meiliSearchInstance && process.env.MEILI_HOST) {
+    try {
+      meiliSearchInstance = new MeiliSearch({
+        host: process.env.MEILI_HOST,
+        apiKey: process.env.MEILI_SEARCH_KEY || process.env.MEILI_ADMIN_KEY || '',
+      });
+    } catch (error) {
+      console.warn('[MeiliSearch] Search client initialization failed:', error);
+    }
+  }
+  return meiliSearchInstance;
+})();
 
 export const PRODUCTS_INDEX = 'products';
 export const INDEX_VERSION = process.env.MEILI_INDEX_VERSION || 'v1';
@@ -18,7 +39,10 @@ export const INDEX_VERSION = process.env.MEILI_INDEX_VERSION || 'v1';
 /**
  * Get the current products index with version
  */
-export function getProductsIndex(client: MeiliSearch = meiliSearch) {
+export function getProductsIndex(client: MeiliSearch | null = meiliSearch) {
+  if (!client) {
+    throw new Error('MeiliSearch client not initialized');
+  }
   return client.index(`${PRODUCTS_INDEX}_${INDEX_VERSION}`);
 }
 
@@ -26,6 +50,9 @@ export function getProductsIndex(client: MeiliSearch = meiliSearch) {
  * Initialize index with settings
  */
 export async function initializeIndex() {
+  if (!meiliAdmin) {
+    throw new Error('MeiliSearch admin client not initialized');
+  }
   const index = getProductsIndex(meiliAdmin);
   
   await index.updateSettings({
