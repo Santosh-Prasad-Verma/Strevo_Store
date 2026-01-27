@@ -22,8 +22,6 @@ Visit `http://localhost:3000`
 
 - **Framework**: Next.js 14 (App Router)
 - **Database**: Supabase (PostgreSQL)
-- **Search**: Meilisearch (optional)
-- **Cache**: Redis (optional)
 - **Payments**: Stripe
 - **UI**: Tailwind CSS + shadcn/ui
 - **Language**: TypeScript
