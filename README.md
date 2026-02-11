@@ -1,6 +1,6 @@
 <div align="center">
 
-![Strevo Store Banner](https://img.shields.io/badge/STREVO-STORE-FF6B6B?style=for-the-badge&labelColor=1a1a1a&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMyAzSDIxVjIxSDNWM1oiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==)
+<img src="./public/Strevo_store_logo.jpg" alt="Strevo Store Logo" width="400" />
 
 # 🛍️ **Strevo Store**
 
