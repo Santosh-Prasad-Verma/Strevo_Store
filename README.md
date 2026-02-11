@@ -1,34 +1,96 @@
+<div align="center">
+
 # 🛍️ Strevo Store
 
-Modern streetwear e-commerce platform built with Next.js 14, Supabase, and advanced caching.
+### Modern Streetwear E-Commerce Platform
+
+*Built with Next.js 14, Supabase, and cutting-edge web technologies*
+
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green?style=for-the-badge&logo=supabase)](https://supabase.com/)
+[![Stripe](https://img.shields.io/badge/Stripe-Payments-purple?style=for-the-badge&logo=stripe)](https://stripe.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38bdf8?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+
+[Features](#-features) • [Quick Start](#-quick-start) • [Tech Stack](#️-tech-stack) • [Documentation](#-support)
+
+</div>
+
+---
 
 ## 🚀 Quick Start
 
+<table>
+<tr>
+<td>
+
+### 1️⃣ Install Dependencies
 ```bash
-# Install dependencies
 npm install
-
-# Setup environment
-cp .env.example .env.local
-# Add your Supabase credentials to .env.local
-
-# Run development server
-npm run dev
 ```
 
-Visit `http://localhost:3000`
+</td>
+<td>
+
+### 2️⃣ Setup Environment
+```bash
+cp .env.example .env.local
+```
+*Add your credentials to `.env.local`*
+
+</td>
+<td>
+
+### 3️⃣ Run Development
+```bash
+npm run dev
+```
+*Visit [localhost:3000](http://localhost:3000)*
+
+</td>
+</tr>
+</table>
 
 ## 🏗️ Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
-- **Database**: Supabase (PostgreSQL)
-- **Payments**: Stripe
-- **UI**: Tailwind CSS + shadcn/ui
-- **Language**: TypeScript
+<table>
+<tr>
+<td align="center" width="20%">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" width="48" height="48" alt="Next.js" />
+<br><strong>Next.js 14</strong>
+<br><sub>App Router</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="48" height="48" alt="TypeScript" />
+<br><strong>TypeScript</strong>
+<br><sub>Type Safety</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" width="48" height="48" alt="Supabase" />
+<br><strong>Supabase</strong>
+<br><sub>PostgreSQL</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://images.ctfassets.net/fzn2n1nzq965/HTTOloNPhisV9P4hlMPNA/cacf1bb88b9fc492dfad34378d844280/Stripe_icon_-_square.svg?q=80&w=256" width="48" height="48" alt="Stripe" />
+<br><strong>Stripe</strong>
+<br><sub>Payments</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" width="48" height="48" alt="Tailwind" />
+<br><strong>Tailwind CSS</strong>
+<br><sub>+ shadcn/ui</sub>
+</td>
+</tr>
+</table>
 
 ## 🌐 Environment Setup
 
-Required in `.env.local`:
+<details>
+<summary><strong>📝 Click to view required environment variables</strong></summary>
+
+<br>
+
+Create a `.env.local` file in the root directory:
 
 ```bash
 # Supabase
@@ -45,53 +107,106 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 REVALIDATE_SECRET=your-secret-key
 ```
 
+> 💡 **Tip**: Get your Supabase credentials from [supabase.com/dashboard](https://supabase.com/dashboard) and Stripe keys from [dashboard.stripe.com](https://dashboard.stripe.com)
+
+</details>
+
 ## 🎯 Features
 
-- ✅ Product catalog with filters
-- ✅ Shopping cart & checkout
-- ✅ User authentication
-- ✅ Order management
-- ✅ Admin dashboard
-- ✅ Stripe payments
-- ✅ Responsive design
-- ✅ Performance optimized
+<table>
+<tr>
+<td width="50%">
 
-## 📁 Key Directories
+### 🛒 Customer Experience
+- ✅ **Product Catalog** with advanced filters
+- ✅ **Shopping Cart** with real-time updates
+- ✅ **Secure Checkout** via Stripe
+- ✅ **User Authentication** & profiles
+- ✅ **Order Tracking** & history
+- ✅ **Responsive Design** for all devices
+
+</td>
+<td width="50%">
+
+### 🎨 Admin & Performance
+- ✅ **Admin Dashboard** for management
+- ✅ **Product Management** CRUD operations
+- ✅ **Order Management** & analytics
+- ✅ **Performance Optimized** with caching
+- ✅ **SEO Friendly** with metadata
+- ✅ **Type-Safe** with TypeScript
+
+</td>
+</tr>
+</table>
+
+## 📁 Project Structure
 
 ```
-app/
-├── api/          # API routes
-├── admin/        # Admin dashboard
-├── products/     # Product pages
-└── checkout/     # Checkout flow
-
-components/
-├── strevo/       # Brand components
-├── ui/           # UI components
-└── auth/         # Auth components
-
-lib/
-├── actions/      # Server actions
-├── supabase/     # Database client
-└── utils.ts      # Utilities
+📦 Strevo Store
+┣ 📂 app/
+┃ ┣ 📂 api/              # API routes & webhooks
+┃ ┣ 📂 admin/            # Admin dashboard pages
+┃ ┣ 📂 products/         # Product catalog & details
+┃ ┗ 📂 checkout/         # Checkout flow
+┣ 📂 components/
+┃ ┣ 📂 strevo/           # Custom brand components
+┃ ┣ 📂 ui/               # Reusable UI components
+┃ ┗ 📂 auth/             # Authentication components
+┣ 📂 lib/
+┃ ┣ 📂 actions/          # Server actions
+┃ ┣ 📂 supabase/         # Database client & queries
+┃ ┗ 📄 utils.ts          # Helper utilities
+┗ 📂 public/             # Static assets
 ```
 
-## 🔧 Scripts
+## 🔧 Available Scripts
 
-```bash
-npm run dev       # Development server
-npm run build     # Production build
-npm run start     # Production server
-```
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | 🚀 Start development server at `localhost:3000` |
+| `npm run build` | 🏗️ Create optimized production build |
+| `npm run start` | ▶️ Start production server |
+| `npm run lint` | 🔍 Run ESLint for code quality |
+| `npm run type-check` | ✅ Run TypeScript type checking |
 
-## 📊 Admin Access
+## 📊 Admin Dashboard
 
-Visit `/admin` to access the admin dashboard for:
-- Product management
-- Order tracking
-- User management
-- Analytics
+<div align="center">
 
-## 🤝 Support
+### 🔐 Access: `/admin`
 
-For setup help, check the documentation in the `docs/` folder.
+</div>
+
+<table>
+<tr>
+<td align="center" width="25%">
+📦<br><strong>Product Management</strong><br><sub>Add, edit, delete products</sub>
+</td>
+<td align="center" width="25%">
+📋<br><strong>Order Tracking</strong><br><sub>Monitor & manage orders</sub>
+</td>
+<td align="center" width="25%">
+👥<br><strong>User Management</strong><br><sub>View customer data</sub>
+</td>
+<td align="center" width="25%">
+📈<br><strong>Analytics</strong><br><sub>Sales & performance metrics</sub>
+</td>
+</tr>
+</table>
+
+## 🤝 Support & Documentation
+
+<div align="center">
+
+📚 **Documentation**: Check the `docs/` folder for detailed guides
+
+💬 **Questions?** Open an issue for support
+
+⭐ **Like this project?** Give it a star!
+
+---
+
+<sub>Built with ❤️ using Next.js and Supabase</sub>
+
+</div>
